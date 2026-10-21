@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<div class="card card-body">
+  <h2>{{ product.name }}</h2>
+  <p class="text-muted">{{ product.category.name }} · sold by {{ product.seller.name }}</p>
+  <p>{{ product.description }}</p>
+  <p class="fs-4">₹{{ '%.0f'|format(product.price) }}</p>
+  <p class="{{ 'text-danger' if product.stock <= 5 else 'text-success' }}">{{ product.stock }} in stock</p>
+  {% if current_user.is_authenticated and product.stock > 0 %}
+  <form method="post" action="{{ url_for('shop.cart_add', product_id=product.id) }}" class="d-flex gap-2">
+    <input class="form-control" style="max-width:100px" type="number" name="qty" value="1" min="1" max="{{ product.stock }}">
+    <button class="btn btn-dark">Add to cart</button>
+  </form>
+  {% endif %}
+</div>
+{# TODO (Ahana): reviews list + review form.  TODO (Ravichandran): pass `recommendations` and show them here with the reason. #}
+{% endblock %}

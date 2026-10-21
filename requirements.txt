@@ -1,0 +1,8 @@
+Flask>=3.0
+Flask-SQLAlchemy>=3.1
+Flask-Login>=0.6
+# Later, when you move to MySQL or PostgreSQL, add ONE of these:
+# PyMySQL
+# psycopg2-binary
+# For the AI sentiment feature later:
+# vaderSentiment

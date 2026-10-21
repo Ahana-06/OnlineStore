@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Seller dashboard{% endblock %}
+{% block content %}
+<h2 class="mb-3">Seller dashboard</h2>
+{% if low_stock %}
+<div class="alert alert-warning"><b>Low stock:</b>
+  {% for p in low_stock %}{{ p.name }} ({{ p.stock }} left){{ ', ' if not loop.last }}{% endfor %}
+</div>
+{% endif %}
+<table class="table bg-white">
+  <thead><tr><th>Product</th><th>Price</th><th>Stock</th></tr></thead>
+  <tbody>{% for p in products %}<tr><td>{{ p.name }}</td><td>₹{{ '%.0f'|format(p.price) }}</td><td>{{ p.stock }}</td></tr>{% endfor %}</tbody>
+</table>
+{# TODO (Ahana): Chart.js charts - sales per week, top products. #}
+{% endblock %}

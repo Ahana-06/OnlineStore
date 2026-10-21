@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<h2 class="mb-3">Checkout</h2>
+<ul class="list-group mb-3">
+  {% for i in items %}
+  <li class="list-group-item d-flex justify-content-between">{{ i.product.name }} × {{ i.qty }}<span>₹{{ '%.0f'|format(i.product.price * i.qty) }}</span></li>
+  {% endfor %}
+  <li class="list-group-item d-flex justify-content-between fw-bold">Total before discount<span>₹{{ '%.0f'|format(total) }}</span></li>
+</ul>
+<form method="post" class="card card-body" style="max-width:420px">
+  <label class="form-label">Discount code (optional)</label>
+  <input class="form-control mb-3" name="code" placeholder="e.g. WELCOME10">
+  <p class="text-muted small">Payment method: Cash on delivery</p>
+  <button class="btn btn-dark">Place order</button>
+</form>
+{% endblock %}
