@@ -13,7 +13,15 @@
   <p class="text-muted small mb-2">{{ o.created_at.strftime('%d %b %Y, %H:%M') }}{% if o.discount_code %} · code {{ o.discount_code }}{% endif %}</p>
   <ul class="mb-2">{% for it in o.items %}<li>{{ it.product.name }} × {{ it.qty }}</li>{% endfor %}</ul>
   <b>Total: ₹{{ '%.0f'|format(o.total) }}</b>
-  {# TODO (Ahana): status timeline Placed -> Packed -> Shipped -> Delivered #}
-</div></div>
+{% set steps = ['Placed', 'Packed', 'Shipped', 'Delivered'] %}
+{% set current = steps.index(o.status) if o.status in steps else 0 %}
+<div class="d-flex justify-content-between text-center mt-3">
+  {% for s in steps %}
+  <div class="flex-fill">
+    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center {{ 'bg-success text-white' if loop.index0 <= current else 'bg-secondary-subtle text-secondary' }}" style="width:32px;height:32px;">{{ '✓' if loop.index0 <= current else loop.index }}</div>
+    <div class="small mt-1 {{ 'fw-bold' if loop.index0 == current else 'text-muted' }}">{{ s }}</div>
+  </div>
+  {% endfor %}
+</div></div></div>
 {% endfor %}
 {% endblock %}
