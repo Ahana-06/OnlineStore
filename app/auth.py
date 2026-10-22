@@ -26,10 +26,15 @@ def role_required(*roles):
     return decorator
 
 
-def log_action(action, entity="", entity_id=None):
-    """Call this whenever an admin/seller changes something (audit log)."""
+def log_action(action, entity="", entity_id=None, details=""):
+    """Call this whenever an admin/seller changes something (audit log).
+
+    It only ADDS the row to the session. The caller commits it together with the change,
+    so the change and its log entry are saved together or not at all.
+    """
     uid = current_user.id if current_user.is_authenticated else None
-    db.session.add(AuditLog(user_id=uid, action=action, entity=entity, entity_id=entity_id))
+    db.session.add(AuditLog(user_id=uid, action=action, entity=entity, entity_id=entity_id,
+                            details=(details or "")[:500]))
 
 
 @bp.route("/register", methods=["GET", "POST"])

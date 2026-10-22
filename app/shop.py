@@ -19,7 +19,7 @@ bp = Blueprint("shop", __name__)
 def products():
     q = request.args.get("q", "").strip()
     cat = request.args.get("category", type=int)
-    query = Product.query
+    query = Product.query.filter_by(is_active=True)  # archived products are hidden
 
     # AI: natural-language search ("wireless earbuds under 2000")
     keywords, min_price, max_price = parse_query(q)
@@ -72,6 +72,9 @@ def cart():
 @login_required
 def cart_add(product_id):
     product = db.get_or_404(Product, product_id)
+    if not product.is_active:
+        flash("That product is no longer available.", "warning")
+        return redirect(url_for("shop.products"))
     qty = max(1, request.form.get("qty", 1, type=int))
     item = CartItem.query.filter_by(user_id=current_user.id, product_id=product.id).first()
     if item:
@@ -116,6 +119,8 @@ def checkout():
         for it in items:
             # lock the row so two buyers cannot take the last item at the same time
             product = Product.query.filter_by(id=it.product_id).with_for_update().one()
+            if not product.is_active:
+                raise ValueError(f"{product.name} is no longer available. Remove it from your cart.")
             if product.stock < it.qty:
                 raise ValueError(f"Not enough stock for {product.name} (only {product.stock} left).")
             product.stock -= it.qty

@@ -46,6 +46,9 @@ class Product(db.Model):
     price = db.Column(db.Float, nullable=False)
     stock = db.Column(db.Integer, nullable=False, default=0)
     image_url = db.Column(db.String(300), default="")
+    # A product that is already in past orders cannot be hard-deleted (order history needs it),
+    # so "delete" archives it instead: it disappears from the shop but the old orders still work.
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     category = db.relationship("Category")
     seller = db.relationship("User")
@@ -128,4 +131,7 @@ class AuditLog(db.Model):
     action = db.Column(db.String(60), nullable=False)
     entity = db.Column(db.String(40), default="")
     entity_id = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    details = db.Column(db.String(500), default="")   # e.g. "price: 499 -> 449"
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    user = db.relationship("User")
