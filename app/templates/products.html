@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<form class="row g-2 mb-4" method="get">
+  <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Try: wireless earbuds under 2000"></div>
+  <div class="col-md-3">
+    <select class="form-select" name="category">
+      <option value="">All categories</option>
+      {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if cat == c.id }}>{{ c.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3"><button class="btn btn-dark w-100">Search</button></div>
+</form>
+
+{% if keywords or min_price is not none or max_price is not none %}
+  <p class="text-muted small">Smart search understood:
+    {% if keywords %}<b>{{ keywords|join(' ') }}</b>{% endif %}
+    {% if min_price is not none %} · from ₹{{ '%.0f'|format(min_price) }}{% endif %}
+    {% if max_price is not none %} · up to ₹{{ '%.0f'|format(max_price) }}{% endif %}
+  </p>
+{% endif %}
+{% if not products %}
+  <div class="alert alert-info">No products found.</div>
+{% endif %}
+<div class="row row-cols-1 row-cols-md-3 g-3">
+  {% for p in products %}
+  <div class="col"><div class="card h-100"><div class="card-body d-flex flex-column">
+    <h5 class="card-title"><a class="text-decoration-none" href="{{ url_for('shop.product_detail', product_id=p.id) }}">{{ p.name }}</a></h5>
+    <p class="text-muted mb-1">{{ p.category.name }}</p>
+    <p class="fs-5 mb-1">₹{{ '%.0f'|format(p.price) }}</p>
+    <p class="small {{ 'text-danger' if p.stock <= 5 else 'text-success' }}">{{ p.stock }} in stock</p>
+    {% if current_user.is_authenticated and p.stock > 0 %}
+    <form method="post" action="{{ url_for('shop.cart_add', product_id=p.id) }}" class="mt-auto">
+      <button class="btn btn-outline-dark btn-sm">Add to cart</button>
+    </form>
+    {% endif %}
+  </div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}

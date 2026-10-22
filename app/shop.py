@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -7,7 +7,6 @@ from . import db
 from sqlalchemy import or_
 
 from .ai.nlsearch import parse_query, stem
-from .analytics import build_chart_data
 from .auth import role_required
 from .insights import assess_order, get_recommendations, review_summary
 from .models import CartItem, Category, Discount, Order, OrderItem, Payment, Product, Review
@@ -164,25 +163,7 @@ def my_orders():
 @bp.route("/seller/dashboard")
 @role_required("seller", "admin")
 def seller_dashboard():
-    # sellers see their own products; admins see everything
-    product_query = Product.query
-    if current_user.role == "seller":
-        product_query = product_query.filter_by(seller_id=current_user.id)
-    my_products = product_query.all()
+    my_products = Product.query.filter_by(seller_id=current_user.id).all()
     low_stock = [p for p in my_products if p.stock <= 5]
-
-    # sales rows for the charts (last 8 weeks)
-    now = datetime.utcnow()
-    rows_query = (
-        db.session.query(OrderItem.qty, OrderItem.price_at_purchase, Order.id, Order.status,
-                         Order.created_at, Product.name)
-        .join(Order, Order.id == OrderItem.order_id)
-        .join(Product, Product.id == OrderItem.product_id)
-        .filter(Order.created_at >= now - timedelta(days=56))
-    )
-    if current_user.role == "seller":
-        rows_query = rows_query.filter(Product.seller_id == current_user.id)
-    chart_data = build_chart_data(rows_query.all(), now)
-
-    return render_template("seller_dashboard.html", products=my_products,
-                           low_stock=low_stock, chart_data=chart_data)
+    # TODO (Ahana): charts. TODO (Ravichandran): JSON route for the chart data.
+    return render_template("seller_dashboard.html", products=my_products, low_stock=low_stock)
