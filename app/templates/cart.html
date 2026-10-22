@@ -1,23 +1,55 @@
 {% extends "base.html" %}
-{% block title %}Cart{% endblock %}
+
+{% block title %}Cart - SmartCart{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">Your cart</h2>
-{% if not items %}
-  <div class="alert alert-info">Your cart is empty. <a href="{{ url_for('shop.products') }}">Browse products</a></div>
-{% else %}
-<table class="table bg-white">
-  <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Subtotal</th><th></th></tr></thead>
-  <tbody>
-  {% for i in items %}
-    <tr>
-      <td>{{ i.product.name }}</td><td>₹{{ '%.0f'|format(i.product.price) }}</td><td>{{ i.qty }}</td>
-      <td>₹{{ '%.0f'|format(i.product.price * i.qty) }}</td>
-      <td><form method="post" action="{{ url_for('shop.cart_remove', item_id=i.id) }}"><button class="btn btn-sm btn-outline-danger">Remove</button></form></td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
-<p class="fs-5">Total: <b>₹{{ '%.0f'|format(total) }}</b></p>
-<a class="btn btn-dark" href="{{ url_for('shop.checkout') }}">Checkout</a>
-{% endif %}
+<div class="row mt-2">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4" style="color: #1a202c;">🛒 Your Shopping Cart</h2>
+
+        {% if items %}
+            <div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+                <div class="table-responsive">
+                <table class="align-middle table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td class="fw-bold">{{ item.product.name }}</td>
+                            <td>₹{{ '%.0f'|format(item.product.price) }}</td>
+                            <td>{{ item.qty }}</td>
+                            <td>₹{{ '%.0f'|format(item.product.price * item.qty) }}</td>
+                            <td class="text-end">
+                                <form method="post" action="{{ url_for('shop.cart_remove', item_id=item.id) }}">
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4 pt-3 border-top">
+                    <h4 class="fw-bold m-0">Total: ₹{{ '%.0f'|format(total) }}</h4>
+                    <a href="{{ url_for('shop.checkout') }}" class="btn btn-add-cart px-4 py-2" style="width: auto;">Proceed to Checkout ➔</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                <span style="font-size: 50px;">🛒</span>
+                <h4 class="fw-bold mt-3">Your cart is empty</h4>
+                <p class="text-muted">Explore our cozy shop and add some lovely items!</p>
+                <a href="{{ url_for('shop.products') }}" class="btn btn-search mt-2">Go to Shop</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

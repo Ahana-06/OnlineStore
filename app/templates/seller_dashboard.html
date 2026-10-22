@@ -1,15 +1,53 @@
 {% extends "base.html" %}
-{% block title %}Seller dashboard{% endblock %}
+
+{% block title %}Dashboard - SmartCart{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">Seller dashboard</h2>
-{% if low_stock %}
-<div class="alert alert-warning"><b>Low stock:</b>
-  {% for p in low_stock %}{{ p.name }} ({{ p.stock }} left){{ ', ' if not loop.last }}{% endfor %}
+<div class="row mt-2">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4" style="color: #1a202c;">📊 Seller Dashboard</h2>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">My products</h6>
+                    <h2 class="fw-bold text-success mt-2">{{ products|length }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">Units in stock</h6>
+                    <h2 class="fw-bold text-success mt-2">{{ products|sum(attribute='stock') }}</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">Low on stock (5 or fewer)</h6>
+                    <h2 class="fw-bold mt-2 {{ 'text-danger' if low_stock else 'text-success' }}">{{ low_stock|length }}</h2>
+                </div>
+            </div>
+        </div>
+
+        {% if low_stock %}
+        <div class="alert alert-warning rounded-4 border-0"><b>Low stock:</b>
+            {% for p in low_stock %}{{ p.name }} ({{ p.stock }} left){{ ', ' if not loop.last }}{% endfor %}
+            · <a href="{{ url_for('insights.restock') }}">See restock predictions</a>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm p-4 rounded-4 bg-white">
+            <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th>Product</th><th>Price</th><th>Stock</th></tr></thead>
+                <tbody>
+                {% for p in products %}
+                    <tr><td>{{ p.name }}</td><td>₹{{ '%.0f'|format(p.price) }}</td>
+                        <td class="{{ 'text-danger fw-bold' if p.stock <= 5 }}">{{ p.stock }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
 </div>
-{% endif %}
-<table class="table bg-white">
-  <thead><tr><th>Product</th><th>Price</th><th>Stock</th></tr></thead>
-  <tbody>{% for p in products %}<tr><td>{{ p.name }}</td><td>₹{{ '%.0f'|format(p.price) }}</td><td>{{ p.stock }}</td></tr>{% endfor %}</tbody>
-</table>
-{# TODO (Ahana): Chart.js charts - sales per week, top products. #}
 {% endblock %}

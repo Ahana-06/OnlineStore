@@ -1,27 +1,44 @@
 {% extends "base.html" %}
-{% block title %}My orders{% endblock %}
+
+{% block title %}My Orders - SmartCart{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">My orders</h2>
-{% if not orders %}
-  <div class="alert alert-info">No orders yet.</div>
-{% endif %}
-{% for o in orders %}
-<div class="card mb-3"><div class="card-body">
-  <div class="d-flex justify-content-between">
-    <b>Order #{{ o.id }}</b><span class="badge text-bg-dark">{{ o.status }}</span>
-  </div>
-  <p class="text-muted small mb-2">{{ o.created_at.strftime('%d %b %Y, %H:%M') }}{% if o.discount_code %} · code {{ o.discount_code }}{% endif %}</p>
-  <ul class="mb-2">{% for it in o.items %}<li>{{ it.product.name }} × {{ it.qty }}</li>{% endfor %}</ul>
-  <b>Total: ₹{{ '%.0f'|format(o.total) }}</b>
-{% set steps = ['Placed', 'Packed', 'Shipped', 'Delivered'] %}
-{% set current = steps.index(o.status) if o.status in steps else 0 %}
-<div class="d-flex justify-content-between text-center mt-3">
-  {% for s in steps %}
-  <div class="flex-fill">
-    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center {{ 'bg-success text-white' if loop.index0 <= current else 'bg-secondary-subtle text-secondary' }}" style="width:32px;height:32px;">{{ '✓' if loop.index0 <= current else loop.index }}</div>
-    <div class="small mt-1 {{ 'fw-bold' if loop.index0 == current else 'text-muted' }}">{{ s }}</div>
-  </div>
-  {% endfor %}
-</div></div></div>
-{% endfor %}
+<div class="row mt-2">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4" style="color: #1a202c;">📦 My Orders</h2>
+
+        {% if not orders %}
+            <div class="text-center py-5 bg-white rounded-4 shadow-sm">
+                <p class="text-muted mb-3">You haven't placed any orders yet.</p>
+                <a href="{{ url_for('shop.products') }}" class="btn btn-search">Start Shopping</a>
+            </div>
+        {% endif %}
+
+        {% set steps = ['Placed', 'Packed', 'Shipped', 'Delivered'] %}
+        {% for o in orders %}
+        {% set current = steps.index(o.status) if o.status in steps else 0 %}
+        <div class="card border-0 shadow-sm p-4 rounded-4 bg-white mb-3">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <h6 class="fw-bold mb-1">Order #{{ o.id }}</h6>
+                    <small class="text-muted">Placed on {{ o.created_at.strftime('%d %b %Y, %H:%M') }}{% if o.discount_code %} · code {{ o.discount_code }}{% endif %}</small>
+                </div>
+                <span class="badge bg-success rounded-pill px-3 py-2">₹{{ '%.0f'|format(o.total) }}</span>
+            </div>
+            <ul class="small text-secondary mt-3 mb-0">
+                {% for it in o.items %}<li>{{ it.product.name }} × {{ it.qty }}</li>{% endfor %}
+            </ul>
+            <div class="d-flex justify-content-between text-center mt-3">
+                {% for s in steps %}
+                <div class="flex-fill">
+                    <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center {{ 'text-white' if loop.index0 <= current else 'bg-secondary-subtle text-secondary' }}"
+                         style="width:32px;height:32px;{{ 'background-color:#3b7a4e;' if loop.index0 <= current }}">{{ '✓' if loop.index0 <= current else loop.index }}</div>
+                    <div class="small mt-1 {{ 'fw-bold' if loop.index0 == current else 'text-muted' }}">{{ s }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
