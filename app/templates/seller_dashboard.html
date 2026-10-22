@@ -1,15 +1,87 @@
 {% extends "base.html" %}
 {% block title %}Seller dashboard{% endblock %}
 {% block content %}
-<h2 class="mb-3">Seller dashboard</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">Seller dashboard</h2>
+  <a class="btn btn-outline-dark btn-sm" href="{{ url_for('insights.restock') }}">Restock predictions</a>
+</div>
+
 {% if low_stock %}
 <div class="alert alert-warning"><b>Low stock:</b>
   {% for p in low_stock %}{{ p.name }} ({{ p.stock }} left){{ ', ' if not loop.last }}{% endfor %}
 </div>
 {% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="card card-body">
+    <div class="text-muted small">Revenue (last 8 weeks)</div>
+    <div class="fs-3 fw-bold">₹{{ '{:,.0f}'.format(chart_data.total_revenue) }}</div>
+  </div></div>
+  <div class="col-md-4"><div class="card card-body">
+    <div class="text-muted small">Units sold</div>
+    <div class="fs-3 fw-bold">{{ chart_data.total_units }}</div>
+  </div></div>
+  <div class="col-md-4"><div class="card card-body">
+    <div class="text-muted small">Orders</div>
+    <div class="fs-3 fw-bold">{{ chart_data.total_orders }}</div>
+  </div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-8"><div class="card card-body">
+    <h5>Revenue per week</h5>
+    <canvas id="revenueChart" height="110"></canvas>
+  </div></div>
+  <div class="col-lg-4"><div class="card card-body">
+    <h5>Orders by status</h5>
+    <canvas id="statusChart" height="220"></canvas>
+  </div></div>
+</div>
+<div class="card card-body mb-4">
+  <h5>Top products (units sold)</h5>
+  {% if chart_data.top_names %}
+    <canvas id="topChart" height="90"></canvas>
+  {% else %}
+    <p class="text-muted mb-0">No sales in the last 8 weeks yet.</p>
+  {% endif %}
+</div>
+
+<h5>Your products</h5>
 <table class="table bg-white">
   <thead><tr><th>Product</th><th>Price</th><th>Stock</th></tr></thead>
   <tbody>{% for p in products %}<tr><td>{{ p.name }}</td><td>₹{{ '%.0f'|format(p.price) }}</td><td>{{ p.stock }}</td></tr>{% endfor %}</tbody>
 </table>
-{# TODO (Ahana): Chart.js charts - sales per week, top products. #}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const data = {{ chart_data|tojson }};
+
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'line',
+    data: {
+      labels: data.week_labels,
+      datasets: [{ label: 'Revenue (₹)', data: data.revenue, borderColor: '#212529',
+                   backgroundColor: 'rgba(33,37,41,0.1)', fill: true, tension: 0.3 }]
+    },
+    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+  });
+
+  new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: data.status_labels,
+      datasets: [{ data: data.status_counts, backgroundColor: ['#6c757d', '#0d6efd', '#fd7e14', '#198754'] }]
+    },
+    options: { plugins: { legend: { position: 'bottom' } } }
+  });
+
+  const topCanvas = document.getElementById('topChart');
+  if (topCanvas) {
+    new Chart(topCanvas, {
+      type: 'bar',
+      data: { labels: data.top_names, datasets: [{ label: 'Units sold', data: data.top_units, backgroundColor: '#212529' }] },
+      options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
+    });
+  }
+</script>
 {% endblock %}
