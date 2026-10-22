@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<h2 class="mb-1">Audit log</h2>
+<p class="text-muted">Every change made by a seller or admin, newest first (last 300).</p>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <select class="form-select" name="entity">
+      <option value="">Everything</option>
+      {% for e in entities %}<option value="{{ e }}" {{ 'selected' if entity == e }}>{{ e|capitalize }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select class="form-select" name="user_id">
+      <option value="">Anyone</option>
+      {% for s in staff %}<option value="{{ s.id }}" {{ 'selected' if user_id == s.id }}>{{ s.name }} ({{ s.role }})</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-dark w-100">Filter</button></div>
+</form>
+{% if not logs %}
+  <div class="alert alert-info">Nothing logged yet.</div>
+{% else %}
+<table class="table bg-white table-sm align-middle">
+  <thead><tr><th>When</th><th>Who</th><th>Action</th><th>What</th><th>Details</th></tr></thead>
+  <tbody>
+  {% for l in logs %}
+    <tr>
+      <td class="small text-nowrap">{{ l.created_at.strftime('%d %b %H:%M') }}</td>
+      <td>{{ l.user.name if l.user else 'system' }}</td>
+      <td>{{ l.action }}</td>
+      <td>{{ l.entity }}{% if l.entity_id %} #{{ l.entity_id }}{% endif %}</td>
+      <td class="small">{{ l.details }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -21,11 +21,13 @@ def create_app(config_class=Config):
     from .shop import bp as shop_bp
     from .insights import bp as insights_bp
     from .seller import bp as seller_bp
+    from .admin import bp as admin_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(shop_bp)
     app.register_blueprint(insights_bp)
     app.register_blueprint(seller_bp)      # /seller/products, /seller/orders
+    app.register_blueprint(admin_bp)       # /admin/users, /admin/audit
 
     @app.errorhandler(403)
     def forbidden(e):
