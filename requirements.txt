@@ -1,8 +1,9 @@
 Flask>=3.0
 Flask-SQLAlchemy>=3.1
 Flask-Login>=0.6
-# Later, when you move to MySQL or PostgreSQL, add ONE of these:
-# PyMySQL
-# psycopg2-binary
-# For the AI sentiment feature later:
-# vaderSentiment
+python-dotenv>=1.0
+# Database driver: keep the ONE you use
+psycopg2-binary>=2.9     # PostgreSQL
+# PyMySQL>=1.1           # MySQL
+# For running the tests:
+pytest>=8.0

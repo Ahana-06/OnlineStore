@@ -4,3 +4,5 @@ __pycache__/
 store.db
 instance/
 .DS_Store
+.env
+.pytest_cache/
