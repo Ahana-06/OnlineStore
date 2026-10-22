@@ -45,7 +45,8 @@ def main():
         db.create_all()
 
         def make_user(name, email, role):
-            u = User(name=name, email=email, role=role)
+            # backdated, so demo accounts are not "new accounts" for the risk check
+            u = User(name=name, email=email, role=role, created_at=datetime.utcnow() - timedelta(days=90))
             u.set_password("password123")
             db.session.add(u)
             return u

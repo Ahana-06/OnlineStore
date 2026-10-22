@@ -12,7 +12,7 @@ from .ai.restock import days_left, restock_status
 from .ai.risk import FLAG_THRESHOLD, risk_score
 from .ai.sentiment import analyze
 from .auth import log_action, role_required
-from .models import Order, OrderItem, Payment, Product, Review
+from .models import Order, OrderItem, Payment, Product, Review, User
 
 bp = Blueprint("insights", __name__)
 
@@ -75,7 +75,9 @@ def assess_order(order, max_line_qty, total):
               .join(Order, Order.id == Payment.order_id)
               .filter(Order.user_id == order.user_id, Payment.status == "Failed",
                       Payment.created_at >= now - timedelta(days=1)).scalar() or 0)
-    return risk_score(max_line_qty, total, orders_last_hour, failed)
+    user = db.session.get(User, order.user_id)
+    age_hours = (now - user.created_at).total_seconds() / 3600 if user and user.created_at else None
+    return risk_score(max_line_qty, total, orders_last_hour, failed, account_age_hours=age_hours)
 
 
 @bp.route("/admin/flagged")
