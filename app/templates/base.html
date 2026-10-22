@@ -14,7 +14,7 @@
         /* Top Navigation Header */
         .navbar-custom {
             background: #ffffff;
-            padding: 16px 40px;
+            padding: 14px 24px;
             border-bottom: 2px dashed #cae2d0;
         }
         .navbar-brand {
@@ -113,18 +113,18 @@
             background-color: #cbd5d0;
             color: #4a5568;
         }
-        .navbar-custom .navbar-nav {
-            flex-wrap: wrap;
-            row-gap: 4px;
+        @media (min-width: 1200px) {
+            .navbar-custom .navbar-nav { flex-wrap: nowrap; white-space: nowrap; }
+            .navbar-custom .nav-link { padding-left: 6px !important; padding-right: 6px !important; }
         }
-        @media (max-width: 991px) {
+        @media (max-width: 1199px) {
             .navbar-custom { padding: 12px 16px; }
         }
     </style>
 </head>
 <body>
     <!-- Top Navigation Bar matching the image -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
+    <nav class="navbar navbar-expand-xl navbar-custom">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('shop.products') }}">
                 <span style="font-size: 22px;">🌱</span> SmartCart
@@ -134,7 +134,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="mainNav">
-            <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+            <div class="navbar-nav ms-auto align-items-xl-center gap-xl-1">
                 <a class="nav-link" href="{{ url_for('shop.products') }}">Shop</a>
                 {% if current_user.is_authenticated %}
                     <a class="nav-link" href="{{ url_for('shop.cart') }}">🛒 Cart</a>
@@ -148,13 +148,24 @@
                     <a class="nav-link" href="{{ url_for('reports.sales_report') }}">📈 Reports</a>
                 {% endif %}
                 {% if current_user.is_authenticated and current_user.role == 'admin' %}
-                    <a class="nav-link text-danger" href="{{ url_for('insights.flagged_orders') }}">🚩 Flagged</a>
-                    <a class="nav-link" href="{{ url_for('admin.users') }}">👥 Users</a>
-                    <a class="nav-link" href="{{ url_for('admin.audit_log') }}">📝 Audit log</a>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">🛡️ Manage</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('insights.flagged_orders') }}">🚩 Flagged orders</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.users') }}">👥 Users</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('admin.audit_log') }}">📝 Audit log</a></li>
+                        </ul>
+                    </div>
                 {% endif %}
                 {% if current_user.is_authenticated %}
-                    <span class="text-muted small">Hi, {{ current_user.name }} ({{ current_user.role }})</span>
-                    <a class="nav-link text-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
+                    <div class="nav-item dropdown ms-xl-2">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">👤 {{ current_user.name }}</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text small text-muted">Signed in as <b>{{ current_user.role }}</b><br>{{ current_user.email }}</span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                        </ul>
+                    </div>
                 {% else %}
                     <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                     <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
@@ -164,7 +175,7 @@
         </div>
     </nav>
 
-    <div class="container mb-5">
+    <div class="container pt-3 mb-5">
         <!-- Flash Alert Bar -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
