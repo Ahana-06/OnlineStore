@@ -1,0 +1,45 @@
+{# Basic placeholder so /seller/orders works. Ahana owns this page and may replace it. #}
+{% extends "base.html" %}
+{% block title %}Orders{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">{{ 'All orders' if current_user.role == 'admin' else 'Orders for my products' }}</h2>
+  <form method="get">
+    <select class="form-select form-select-sm" name="status" onchange="this.form.submit()">
+      <option value="">All statuses</option>
+      {% for s in statuses %}<option value="{{ s }}" {{ 'selected' if status == s }}>{{ s }}</option>{% endfor %}
+    </select>
+  </form>
+</div>
+{% if not orders %}
+  <div class="alert alert-info">No orders here.</div>
+{% else %}
+<table class="table bg-white align-middle">
+  <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+  {% for o in orders %}
+    {% set nxt = next_status(o.status) %}
+    {% set held = (o.risk_score or 0) >= threshold %}
+    <tr>
+      <td>#{{ o.id }}</td>
+      <td class="small text-nowrap">{{ o.created_at.strftime('%d %b %H:%M') }}</td>
+      <td>{{ o.user.name }}</td>
+      <td class="small">{% for it in o.items %}{{ it.product.name }} × {{ it.qty }}{{ ', ' if not loop.last }}{% endfor %}</td>
+      <td>₹{{ '%.0f'|format(o.total) }}</td>
+      <td>{{ o.status }}{% if held %} <span class="badge text-bg-danger" title="{{ o.risk_reason }}">flagged</span>{% endif %}</td>
+      <td class="text-end">
+        {% if nxt and not (held and current_user.role != 'admin') %}
+        <form method="post" action="{{ url_for('seller.update_order_status', order_id=o.id) }}">
+          <input type="hidden" name="status" value="{{ nxt }}">
+          <button class="btn btn-sm btn-outline-dark">Mark {{ nxt }}</button>
+        </form>
+        {% elif held and nxt %}
+          <span class="small text-muted">Waiting for admin review</span>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

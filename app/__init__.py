@@ -1,5 +1,4 @@
 from flask import Flask, render_template
-from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
@@ -21,10 +20,12 @@ def create_app(config_class=Config):
     from .auth import bp as auth_bp
     from .shop import bp as shop_bp
     from .insights import bp as insights_bp
+    from .seller import bp as seller_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(shop_bp)
     app.register_blueprint(insights_bp)
+    app.register_blueprint(seller_bp)      # /seller/products, /seller/orders
 
     @app.errorhandler(403)
     def forbidden(e):

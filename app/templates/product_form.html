@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit ' ~ product.name if product else 'Add product' }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-md-7">
+  <h2 class="mb-3">{{ 'Edit ' ~ product.name if product else 'Add a product' }}</h2>
+  <form method="post" class="card card-body">
+    <label class="form-label">Name</label>
+    <input class="form-control mb-3" name="name" value="{{ form.name or '' }}" required>
+
+    <label class="form-label">Description</label>
+    <textarea class="form-control mb-3" name="description" rows="3">{{ form.description or '' }}</textarea>
+
+    <div class="row g-3 mb-3">
+      <div class="col"><label class="form-label">Price (₹)</label>
+        <input class="form-control" type="number" name="price" step="0.01" min="0.01" value="{{ form.price if form.price is not none else '' }}" required></div>
+      <div class="col"><label class="form-label">Stock</label>
+        <input class="form-control" type="number" name="stock" min="0" step="1" value="{{ form.stock if form.stock is not none else '' }}" required></div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col"><label class="form-label">Category</label>
+        <select class="form-select" name="category_id">
+          <option value="">Choose…</option>
+          {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if form.category_id == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select></div>
+      <div class="col"><label class="form-label">…or new category</label>
+        <input class="form-control" name="new_category" value="{{ form.new_category or '' }}" placeholder="e.g. Stationery"></div>
+    </div>
+
+    <label class="form-label">Image URL (optional)</label>
+    <input class="form-control mb-3" name="image_url" value="{{ form.image_url or '' }}">
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-dark">{{ 'Save changes' if product else 'Add product' }}</button>
+      <a class="btn btn-outline-secondary" href="{{ url_for('seller.products') }}">Cancel</a>
+    </div>
+  </form>
+</div></div>
+{% endblock %}
