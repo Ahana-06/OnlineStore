@@ -3,148 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Shop - SmartCart{% endblock %}</title>
+    <title>{% block title %}SmartCart{% endblock %}</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f3f8f4;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            min-height: 100vh;
+        body { 
+            background-color: #fcfbf7; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
         }
-        /* Top Navigation Header */
         .navbar-custom {
-            background: #ffffff;
-            padding: 16px 40px;
-            border-bottom: 2px dashed #cae2d0;
-        }
-        .navbar-brand {
-            font-weight: 800;
-            font-size: 22px;
-            color: #1a202c;
-        }
-        .nav-link {
-            color: #2d3748 !important;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        /* Hero Banner */
-        .hero-banner {
-            background: linear-gradient(180deg, #e4f2e7 0%, #d5ebd9 100%);
-            border-radius: 24px;
-            padding: 36px 48px;
-            margin: 24px auto;
-            position: relative;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-        }
-        .badge-cozy {
-            background: #ffffff;
-            color: #2e5a39;
-            border-radius: 20px;
-            padding: 6px 16px;
-            font-size: 12px;
-            font-weight: 700;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-        }
-        /* Search Input Capsule */
-        .search-capsule {
-            background: #ffffff;
-            border-radius: 40px;
-            padding: 6px 8px 6px 18px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            max-width: 580px;
-        }
-        .search-capsule input, .search-capsule select {
-            border: none !important;
-            box-shadow: none !important;
-            font-size: 14px;
-        }
-        .btn-search {
-            background-color: #3f704d;
-            color: white;
-            border-radius: 30px;
-            padding: 8px 24px;
-            font-weight: 700;
-            font-size: 14px;
-            border: none;
-        }
-        .btn-search:hover {
-            background-color: #2e5438;
-            color: white;
-        }
-        /* Product Cards */
-        .product-card {
-            background: #ffffff;
-            border-radius: 24px;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-            padding: 20px;
-        }
-        .product-img-box {
-            border-radius: 18px;
-            height: 160px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-        }
-        .badge-stock {
-            background-color: #3b7a4e;
-            color: white;
-            font-size: 11px;
-            border-radius: 12px;
-            padding: 4px 10px;
-            font-weight: 600;
+            background-color: #ffffff;
+            border-bottom: 2px dotted #d1e7dd;
         }
         .btn-add-cart {
-            background-color: #3b7a4e;
+            background-color: #2e7d32;
             color: white;
-            border-radius: 12px;
-            font-weight: 700;
-            padding: 10px 0;
-            width: 100%;
-            border: none;
-            transition: background 0.2s;
+            border-radius: 50rem;
+            transition: all 0.2s;
         }
         .btn-add-cart:hover {
-            background-color: #2b5b3a;
+            background-color: #1b5e20;
             color: white;
         }
     </style>
 </head>
 <body>
-    <!-- Top Navigation Bar matching the image -->
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('shop.index') }}">
-                <span style="font-size: 22px;">🌱</span> SmartCart
+    <!-- Top Navigation Bar matching your exact design -->
+    <nav class="navbar navbar-expand-lg navbar-custom py-2 shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('shop.index') }}">
+                <span class="fs-4 me-2">🌱</span> <span style="color: #2c3e50;">SmartCart</span>
             </a>
-            <div class="navbar-nav ms-auto align-items-center gap-4">
-                <a class="nav-link" href="{{ url_for('shop.index') }}">Shop</a>
-                <a class="nav-link" href="{{ url_for('shop.cart') }}">🛒 Cart</a>
-                <a class="nav-link" href="{{ url_for('shop.my_orders') }}">📦 My orders</a>
-                {% if current_user.is_authenticated and current_user.is_admin %}
-                    <a class="nav-link" href="{{ url_for('shop.dashboard') }}">📊 Dashboard</a>
-                    <a class="nav-link" href="{{ url_for('shop.restock') }}">🌱 Restock</a>
-                    <a class="nav-link text-danger" href="#">🚩 Flagged</a>
-                {% endif %}
-                {% if current_user.is_authenticated %}
-                    <span class="text-muted small">Hi, {{ current_user.username }}</span>
-                    <a class="nav-link text-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
-                {% else %}
-                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-                    <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-                {% endif %}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav align-items-center gap-3">
+                    <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.index') }}">Shop</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.cart') }}">Cart</a></li>
+                    <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.orders') }}">My orders</a></li>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                        <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.dashboard') }}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.restock') }}">Restock</a></li>
+                        <li class="nav-item"><a class="nav-link fw-semibold text-dark" href="{{ url_for('shop.flagged') }}">Flagged</a></li>
+                    {% endif %}
+                    
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item text-muted small px-2">Hi, {{ current_user.username }}</li>
+                        <li class="nav-item"><a class="btn btn-outline-danger btn-sm rounded-pill px-3" href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="btn btn-outline-success btn-sm rounded-pill px-3" href="{{ url_for('auth.login') }}">Login</a></li>
+                    {% endif %}
+                </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mb-5">
-        <!-- Flash Alert Bar -->
+    <!-- Flash Messages & Main Content Container -->
+    <div class="container my-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-success mt-3 py-2 px-4 rounded-3 border-0" style="background-color: #d1e7dd; color: #0f5132;" role="alert">
+                    <div class="alert alert-{{ category if category != 'message' else 'success' }} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
                         {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -153,6 +75,7 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

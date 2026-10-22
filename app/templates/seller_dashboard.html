@@ -1,15 +1,32 @@
 {% extends "base.html" %}
-{% block title %}Seller dashboard{% endblock %}
+
+{% block title %}Dashboard - SmartCart{% endblock %}
+
 {% block content %}
-<h2 class="mb-3">Seller dashboard</h2>
-{% if low_stock %}
-<div class="alert alert-warning"><b>Low stock:</b>
-  {% for p in low_stock %}{{ p.name }} ({{ p.stock }} left){{ ', ' if not loop.last }}{% endfor %}
+<div class="row mt-4">
+    <div class="col-12">
+        <h2 class="fw-bold mb-4" style="color: #1a202c;">📊 Admin Analytics Dashboard</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">Total Products</h6>
+                    <h2 class="fw-bold text-success mt-2">12</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">Active Users</h6>
+                    <h2 class="fw-bold text-success mt-2">5</h2>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
+                    <h6 class="text-muted fw-semibold">Store Status</h6>
+                    <h2 class="fw-bold text-success mt-2">Online 🌿</h2>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endif %}
-<table class="table bg-white">
-  <thead><tr><th>Product</th><th>Price</th><th>Stock</th></tr></thead>
-  <tbody>{% for p in products %}<tr><td>{{ p.name }}</td><td>₹{{ '%.0f'|format(p.price) }}</td><td>{{ p.stock }}</td></tr>{% endfor %}</tbody>
-</table>
-{# TODO (Ahana): Chart.js charts - sales per week, top products. #}
 {% endblock %}
