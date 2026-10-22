@@ -1,40 +1,72 @@
 {% extends "base.html" %}
-{% block title %}Products{% endblock %}
-{% block content %}
-<form class="row g-2 mb-4" method="get">
-  <div class="col-md-6"><input class="form-control" name="q" value="{{ q }}" placeholder="Try: wireless earbuds under 2000"></div>
-  <div class="col-md-3">
-    <select class="form-select" name="category">
-      <option value="">All categories</option>
-      {% for c in categories %}<option value="{{ c.id }}" {{ 'selected' if cat == c.id }}>{{ c.name }}</option>{% endfor %}
-    </select>
-  </div>
-  <div class="col-md-3"><button class="btn btn-dark w-100">Search</button></div>
-</form>
+{% import "_mascot.html" as mascot_macro %}
 
-{% if keywords or min_price is not none or max_price is not none %}
-  <p class="text-muted small">Smart search understood:
-    {% if keywords %}<b>{{ keywords|join(' ') }}</b>{% endif %}
-    {% if min_price is not none %} · from ₹{{ '%.0f'|format(min_price) }}{% endif %}
-    {% if max_price is not none %} · up to ₹{{ '%.0f'|format(max_price) }}{% endif %}
-  </p>
-{% endif %}
-{% if not products %}
-  <div class="alert alert-info">No products found.</div>
-{% endif %}
-<div class="row row-cols-1 row-cols-md-3 g-3">
-  {% for p in products %}
-  <div class="col"><div class="card h-100"><div class="card-body d-flex flex-column">
-    <h5 class="card-title"><a class="text-decoration-none" href="{{ url_for('shop.product_detail', product_id=p.id) }}">{{ p.name }}</a></h5>
-    <p class="text-muted mb-1">{{ p.category.name }}</p>
-    <p class="fs-5 mb-1">₹{{ '%.0f'|format(p.price) }}</p>
-    <p class="small {{ 'text-danger' if p.stock <= 5 else 'text-success' }}">{{ p.stock }} in stock</p>
-    {% if current_user.is_authenticated and p.stock > 0 %}
-    <form method="post" action="{{ url_for('shop.cart_add', product_id=p.id) }}" class="mt-auto">
-      <button class="btn btn-outline-dark btn-sm">Add to cart</button>
-    </form>
+{% block content %}
+<!-- Soft Green Hero Banner with Pico -->
+<div class="hero-banner d-flex justify-content-between align-items-center flex-wrap">
+    <div style="flex: 1; min-width: 300px;">
+        <span class="badge-cozy mb-3 d-inline-block">✨ your cozy little shop</span>
+        <h1 class="fw-bold mb-2" style="color: #1a202c; font-size: 38px;">Find something lovely today</h1>
+        <p class="text-secondary mb-4" style="font-size: 15px;">Smart search understands you. Try "wireless earbuds under 2000".</p>
+        
+        <!-- Integrated Capsule Search Bar -->
+        <form method="GET" action="{{ url_for('shop.index') }}" class="search-capsule d-flex align-items-center gap-2">
+            <input type="text" name="q" class="form-control" placeholder="What are you looking for?" value="{{ request.args.get('q', '') }}">
+            <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
+            <select name="category" class="form-select w-auto text-secondary">
+                <option value="">All categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if request.args.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-search">Search</button>
+        </form>
+    </div>
+    
+    <!-- Pico Sprout Mascot Component -->
+    <div class="mt-3 mt-md-0 ps-md-4">
+        {{ mascot_macro.mascot(message="Hi, I'm Pico!") }}
+    </div>
+</div>
+
+<!-- Product Cards Grid -->
+<div class="row g-4 mt-2">
+    {% if products %}
+        {% for product in products %}
+        <div class="col-md-4">
+            <div class="product-card h-100 d-flex flex-column">
+                <!-- Image Container with soft pastel backgrounds -->
+                <div class="product-img-box" style="background-color: {% if loop.index0 % 3 == 0 %}#fce8d5{% else %}#e2f2e4{% endif %};">
+                    <span style="font-size: 58px;">
+                        {% if 'Sneaker' in product.name %}👟{% elif 'Mug' in product.name or 'Bedsheet' in product.name %}🏡{% else %}📦{% endif %}
+                    </span>
+                </div>
+                
+                <h5 class="fw-bold mb-1" style="color: #1a202c; font-size: 18px;">{{ product.name }}</h5>
+                <div class="text-muted small mb-2">{{ product.category.name if product.category else 'Home' }}</div>
+                
+                <div class="fs-4 fw-bold mb-2" style="color: #1a202c;">₹{{ product.price|int }}</div>
+                
+                <div class="mb-3">
+                    <span class="badge-stock">{{ product.stock }} in stock</span>
+                </div>
+                
+                <!-- Full-width Dark Green Add to Cart Button -->
+                <div class="mt-auto">
+                    <form action="{{ url_for('shop.add_to_cart', product_id=product.id) }}" method="POST">
+                        <button type="submit" class="btn-add-cart">Add to cart 🛒</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <div class="p-5 rounded-4 bg-white shadow-sm">
+                <h4 class="fw-bold mb-2">No products found</h4>
+                <p class="text-muted">Seed sample products into your database to populate the store grid.</p>
+            </div>
+        </div>
     {% endif %}
-  </div></div></div>
-  {% endfor %}
 </div>
 {% endblock %}
