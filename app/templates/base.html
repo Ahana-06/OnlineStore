@@ -20,6 +20,7 @@
           <a class="nav-link" href="{{ url_for('seller.products') }}">Manage products</a>
           <a class="nav-link" href="{{ url_for('seller.orders') }}">Manage orders</a>
           <a class="nav-link" href="{{ url_for('insights.restock') }}">Restock</a>
+          <a class="nav-link" href="{{ url_for('reports.sales_report') }}">Reports</a>
         {% endif %}
         {% if current_user.role == 'admin' %}
           <a class="nav-link" href="{{ url_for('insights.flagged_orders') }}">Flagged orders</a>
