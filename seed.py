@@ -8,6 +8,8 @@ import random
 from datetime import datetime, timedelta
 
 from app import create_app, db
+from app.ai.risk import risk_score
+from app.ai.sentiment import analyze
 from app.models import (Category, Discount, Order, OrderItem, Payment, Product,
                         Review, User)
 
@@ -65,6 +67,9 @@ def main():
                             stock=random.randint(8, 60), description=f"{name} - good quality.")
                 db.session.add(p)
                 products[name] = p
+        # make two products run low so the restock page has something to show
+        products["Wireless Earbuds"].stock = 4
+        products["Yoga Mat"].stock = 6
         db.session.flush()
 
         db.session.add(Discount(code="WELCOME10", percent=10, active=True))
@@ -91,14 +96,29 @@ def main():
             db.session.add(Payment(order_id=order.id, amount=total, method="COD",
                                    status="Failed" if failed else "Paid", created_at=when))
 
+        # a few suspicious orders so the admin "Flagged orders" page has data
+        def suspicious(buyer, product_name, qty, orders_last_hour=0, failed=0):
+            p = products[product_name]
+            total = p.price * qty
+            score, reason = risk_score(qty, total, orders_last_hour, failed)
+            o = Order(user_id=buyer.id, status="Placed", total=total, risk_score=score, risk_reason=reason)
+            db.session.add(o)
+            db.session.flush()
+            db.session.add(OrderItem(order_id=o.id, product_id=p.id, qty=qty, price_at_purchase=p.price))
+            db.session.add(Payment(order_id=o.id, amount=total, method="COD", status="Paid"))
+
+        suspicious(customers[3], "Phone Case", 25)
+        suspicious(customers[5], "Dumbbell Set", 12)
+        suspicious(customers[7], "Power Bank", 2, orders_last_hour=4, failed=3)
+
         for p in products.values():
             for _ in range(random.randint(1, 3)):
                 rating, text = random.choice(REVIEWS)
                 db.session.add(Review(product_id=p.id, user_id=random.choice(customers).id,
-                                      rating=rating, text=text))
+                                      rating=rating, text=text, sentiment=analyze(text, rating)[0]))
 
         db.session.commit()
-        print(f"Seeded: {len(products)} products, {len(customers) + 2} users, 120 orders.")
+        print(f"Seeded: {len(products)} products, {len(customers) + 2} users, 123 orders (3 flagged).")
         print("Login with admin@store.com / seller@store.com / customer@store.com  (password123)")
 
 

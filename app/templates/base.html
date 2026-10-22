@@ -17,6 +17,10 @@
         <a class="nav-link" href="{{ url_for('shop.my_orders') }}">My orders</a>
         {% if current_user.role in ('seller', 'admin') %}
           <a class="nav-link" href="{{ url_for('shop.seller_dashboard') }}">Seller dashboard</a>
+          <a class="nav-link" href="{{ url_for('insights.restock') }}">Restock</a>
+        {% endif %}
+        {% if current_user.role == 'admin' %}
+          <a class="nav-link" href="{{ url_for('insights.flagged_orders') }}">Flagged orders</a>
         {% endif %}
         <span class="navbar-text text-secondary">{{ current_user.name }} ({{ current_user.role }})</span>
         <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>

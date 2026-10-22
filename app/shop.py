@@ -4,8 +4,12 @@ from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
 from . import db
+from sqlalchemy import or_
+
+from .ai.nlsearch import parse_query, stem
 from .auth import role_required
-from .models import CartItem, Category, Discount, Order, OrderItem, Payment, Product
+from .insights import assess_order, get_recommendations, review_summary
+from .models import CartItem, Category, Discount, Order, OrderItem, Payment, Product, Review
 
 bp = Blueprint("shop", __name__)
 
@@ -16,24 +20,43 @@ def products():
     q = request.args.get("q", "").strip()
     cat = request.args.get("category", type=int)
     query = Product.query
-    if q:
-        query = query.filter(Product.name.ilike(f"%{q}%"))
+
+    # AI: natural-language search ("wireless earbuds under 2000")
+    keywords, min_price, max_price = parse_query(q)
+    for kw in keywords:
+        term = f"%{stem(kw)}%"
+        query = query.filter(or_(Product.name.ilike(term), Product.description.ilike(term),
+                                 Product.category.has(Category.name.ilike(term))))
+    if min_price is not None:
+        query = query.filter(Product.price >= min_price)
+    if max_price is not None:
+        query = query.filter(Product.price <= max_price)
     if cat:
         query = query.filter_by(category_id=cat)
+
     return render_template(
         "products.html",
         products=query.order_by(Product.name).all(),
         categories=Category.query.order_by(Category.name).all(),
         q=q,
         cat=cat,
+        keywords=keywords,
+        min_price=min_price,
+        max_price=max_price,
     )
 
 
 @bp.route("/products/<int:product_id>")
 def product_detail(product_id):
     product = db.get_or_404(Product, product_id)
-    # TODO (Ravichandran, AI): recommendations = recommend(product_id)
-    return render_template("product_detail.html", product=product)
+    reviews = Review.query.filter_by(product_id=product.id).order_by(Review.created_at.desc()).all()
+    return render_template(
+        "product_detail.html",
+        product=product,
+        recommendations=get_recommendations(product.id),  # AI: bought-together
+        reviews=reviews,
+        summary=review_summary(reviews),                  # AI: sentiment counts
+    )
 
 
 # ---------------------------------------------------------------- cart
@@ -115,7 +138,9 @@ def checkout():
         db.session.add(Payment(order_id=order.id, amount=order.total, method="COD", status="Paid"))
         CartItem.query.filter_by(user_id=current_user.id).delete()
 
-        # TODO (Ravichandran, AI): order.risk_score, order.risk_reason = risk_score(order)
+        # AI: risky-order check (rule-based score, see app/ai/risk.py)
+        order.risk_score, order.risk_reason = assess_order(
+            order, max(it.qty for it in items), order.total)
 
         db.session.commit()
     except ValueError as e:
