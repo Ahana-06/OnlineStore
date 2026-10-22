@@ -1,21 +1,47 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
+
+{% block title %}Register - SmartCart{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center"><div class="col-md-5">
-  <h2 class="mb-3">Create account</h2>
-  <form method="post" class="card card-body">
-    <label class="form-label">Name</label>
-    <input class="form-control mb-3" name="name" required>
-    <label class="form-label">Email</label>
-    <input class="form-control mb-3" type="email" name="email" required>
-    <label class="form-label">Password (6+ characters)</label>
-    <input class="form-control mb-3" type="password" name="password" minlength="6" required>
-    <label class="form-label">I want to</label>
-    <select class="form-select mb-3" name="role">
-      <option value="customer">Buy products</option>
-      <option value="seller">Sell products</option>
-    </select>
-    <button class="btn btn-dark">Register</button>
-  </form>
-</div></div>
+<div class="d-flex justify-content-center align-items-center my-5">
+    <div class="card p-4 shadow-sm border-0" style="max-width: 420px; width: 100%; border-radius: 24px; background: #ffffff;">
+        <div class="text-center mb-4">
+            <span style="font-size: 40px;">✨</span>
+            <h3 class="fw-bold mt-2" style="color: #1a202c;">Create an Account</h3>
+            <p class="text-muted small">Join SmartCart and start shopping today</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-secondary">Your name</label>
+                <input type="text" name="name" class="form-control rounded-3 py-2 px-3 border-light-subtle" placeholder="e.g. Priya Sharma" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-secondary">Email</label>
+                <input type="email" name="email" class="form-control rounded-3 py-2 px-3 border-light-subtle" placeholder="name@example.com" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-secondary">Password</label>
+                <input type="password" name="password" minlength="6" class="form-control rounded-3 py-2 px-3 border-light-subtle" placeholder="At least 6 characters" required>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-secondary">I want to</label>
+                <select name="role" class="form-select rounded-3 py-2 px-3 border-light-subtle">
+                    <option value="customer">Buy products</option>
+                    <option value="seller">Sell products</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-add-cart py-2 fw-bold mb-3">Register ➔</button>
+        </form>
+
+        <div class="text-center">
+            <span class="text-muted small">Already have an account?</span>
+            <a href="{{ url_for('auth.login') }}" class="fw-bold small text-success text-decoration-none ms-1">Log in here</a>
+        </div>
+    </div>
+</div>
 {% endblock %}

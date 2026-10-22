@@ -1,48 +1,184 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Online Store{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Shop - SmartCart{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f3f8f4;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+        }
+        /* Top Navigation Header */
+        .navbar-custom {
+            background: #ffffff;
+            padding: 16px 40px;
+            border-bottom: 2px dashed #cae2d0;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 22px;
+            color: #1a202c;
+        }
+        .nav-link {
+            color: #2d3748 !important;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        /* Hero Banner */
+        .hero-banner {
+            background: linear-gradient(180deg, #e4f2e7 0%, #d5ebd9 100%);
+            border-radius: 24px;
+            padding: 36px 48px;
+            margin: 24px auto;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+        }
+        .badge-cozy {
+            background: #ffffff;
+            color: #2e5a39;
+            border-radius: 20px;
+            padding: 6px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        /* Search Input Capsule */
+        .search-capsule {
+            background: #ffffff;
+            border-radius: 40px;
+            padding: 6px 8px 6px 18px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            max-width: 580px;
+        }
+        .search-capsule input, .search-capsule select {
+            border: none !important;
+            box-shadow: none !important;
+            font-size: 14px;
+        }
+        .btn-search {
+            background-color: #3f704d;
+            color: white;
+            border-radius: 30px;
+            padding: 8px 24px;
+            font-weight: 700;
+            font-size: 14px;
+            border: none;
+        }
+        .btn-search:hover {
+            background-color: #2e5438;
+            color: white;
+        }
+        /* Product Cards */
+        .product-card {
+            background: #ffffff;
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            padding: 20px;
+        }
+        .product-img-box {
+            border-radius: 18px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .badge-stock {
+            background-color: #3b7a4e;
+            color: white;
+            font-size: 11px;
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-weight: 600;
+        }
+        .btn-add-cart {
+            background-color: #3b7a4e;
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            padding: 10px 0;
+            width: 100%;
+            border: none;
+            transition: background 0.2s;
+        }
+        .btn-add-cart:hover {
+            background-color: #2b5b3a;
+            color: white;
+        }
+        .btn-add-cart:disabled {
+            background-color: #cbd5d0;
+            color: #4a5568;
+        }
+        .navbar-custom .navbar-nav {
+            flex-wrap: wrap;
+            row-gap: 4px;
+        }
+        @media (max-width: 991px) {
+            .navbar-custom { padding: 12px 16px; }
+        }
+    </style>
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-  <div class="container">
-    <a class="navbar-brand" href="{{ url_for('shop.products') }}">Online Store</a>
-    <div class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
-      <a class="nav-link" href="{{ url_for('shop.products') }}">Products</a>
-      {% if current_user.is_authenticated %}
-        <a class="nav-link" href="{{ url_for('shop.cart') }}">Cart</a>
-        <a class="nav-link" href="{{ url_for('shop.my_orders') }}">My orders</a>
-        {% if current_user.role in ('seller', 'admin') %}
-          <a class="nav-link" href="{{ url_for('shop.seller_dashboard') }}">Seller dashboard</a>
-          <a class="nav-link" href="{{ url_for('seller.products') }}">Manage products</a>
-          <a class="nav-link" href="{{ url_for('seller.orders') }}">Manage orders</a>
-          <a class="nav-link" href="{{ url_for('insights.restock') }}">Restock</a>
-          <a class="nav-link" href="{{ url_for('reports.sales_report') }}">Reports</a>
-        {% endif %}
-        {% if current_user.role == 'admin' %}
-          <a class="nav-link" href="{{ url_for('insights.flagged_orders') }}">Flagged orders</a>
-          <a class="nav-link" href="{{ url_for('admin.users') }}">Users</a>
-          <a class="nav-link" href="{{ url_for('admin.audit_log') }}">Audit log</a>
-        {% endif %}
-        <span class="navbar-text text-secondary">{{ current_user.name }} ({{ current_user.role }})</span>
-        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
-      {% else %}
-        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
-        <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
-      {% endif %}
+<body>
+    <!-- Top Navigation Bar matching the image -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ url_for('shop.products') }}">
+                <span style="font-size: 22px;">🌱</span> SmartCart
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+            <div class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                <a class="nav-link" href="{{ url_for('shop.products') }}">Shop</a>
+                {% if current_user.is_authenticated %}
+                    <a class="nav-link" href="{{ url_for('shop.cart') }}">🛒 Cart</a>
+                    <a class="nav-link" href="{{ url_for('shop.my_orders') }}">📦 My orders</a>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.role in ('seller', 'admin') %}
+                    <a class="nav-link" href="{{ url_for('shop.seller_dashboard') }}">📊 Dashboard</a>
+                    <a class="nav-link" href="{{ url_for('seller.products') }}">🏷️ Products</a>
+                    <a class="nav-link" href="{{ url_for('seller.orders') }}">🚚 Orders</a>
+                    <a class="nav-link" href="{{ url_for('insights.restock') }}">🌱 Restock</a>
+                    <a class="nav-link" href="{{ url_for('reports.sales_report') }}">📈 Reports</a>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <a class="nav-link text-danger" href="{{ url_for('insights.flagged_orders') }}">🚩 Flagged</a>
+                    <a class="nav-link" href="{{ url_for('admin.users') }}">👥 Users</a>
+                    <a class="nav-link" href="{{ url_for('admin.audit_log') }}">📝 Audit log</a>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                    <span class="text-muted small">Hi, {{ current_user.name }} ({{ current_user.role }})</span>
+                    <a class="nav-link text-secondary" href="{{ url_for('auth.logout') }}">Logout</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
+                {% endif %}
+            </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <!-- Flash Alert Bar -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category in ('success', 'danger', 'warning', 'info') else 'info' }} mt-3 py-2 px-4 rounded-3 border-0" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
     </div>
-  </div>
-</nav>
-<main class="container pb-5">
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endwith %}
-  {% block content %}{% endblock %}
-</main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

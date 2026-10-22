@@ -145,7 +145,7 @@ def test_seller_cannot_move_orders_without_their_products(client, data):
     order = make_order(data["customer"], [(data["buds"], 1)])   # seller2's product
     login(client, "seller@test.com")
     assert client.post(f"/seller/orders/{order.id}/status", data={"status": "Packed"}).status_code == 403
-    assert b"#%d" % order.id not in client.get("/seller/orders").data
+    assert b"<td>#%d</td>" % order.id not in client.get("/seller/orders").data
 
 
 def test_flagged_order_is_held_for_seller_but_not_admin(client, data):

@@ -1,0 +1,29 @@
+{% macro mascot(theme=None, class=None, message="Hi, I'm Pico!", extra=None) %}
+<div class="d-flex flex-column align-items-center position-relative">
+    <!-- Speech Bubble above Pico -->
+    <div class="bg-white text-dark px-3 py-1 rounded-pill fw-bold shadow-sm mb-2 position-relative" style="font-size: 13px; border: 1px solid #e2e8f0; border-radius: 18px !important;">
+        {{ message }} 🍃
+    </div>
+    
+    <!-- SVG Vector Sprouty Character Pico -->
+    <svg width="110" height="110" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Sprout leaves on top -->
+        <path d="M50 35C50 35 42 20 28 25C28 25 32 38 50 35Z" fill="#52805d"/>
+        <path d="M50 35C50 35 58 20 72 25C72 25 68 38 50 35Z" fill="#52805d"/>
+        <path d="M50 35V26" stroke="#3b6144" stroke-width="3" stroke-linecap="round"/>
+        <!-- Round Body -->
+        <circle cx="50" cy="62" r="28" fill="#ffffff" stroke="#2d3748" stroke-width="3.5"/>
+        <!-- Cute Eyes -->
+        <circle cx="41" cy="58" r="3.5" fill="#2d3748"/>
+        <circle cx="59" cy="58" r="3.5" fill="#2d3748"/>
+        <!-- Rosy Cheeks -->
+        <ellipse cx="35" cy="64" rx="4" ry="2.5" fill="#fbbf24" opacity="0.6"/>
+        <ellipse cx="65" cy="64" rx="4" ry="2.5" fill="#fbbf24" opacity="0.6"/>
+        <!-- Smile -->
+        <path d="M46 65C48 67 52 67 54 65" stroke="#2d3748" stroke-width="3" stroke-linecap="round"/>
+        <!-- Feet -->
+        <ellipse cx="42" cy="90" rx="5" ry="3" fill="#2d3748"/>
+        <ellipse cx="58" cy="90" rx="5" ry="3" fill="#2d3748"/>
+    </svg>
+</div>
+{% endmacro %}
